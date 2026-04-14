@@ -33,3 +33,23 @@ exports.likePost=async(req,res)=>{
 
     }
 }
+
+exports.dislikePost=async(req,res)=>{
+    try{
+        const {likeid,postId}=req.body
+        await Like.findByIdAndDelete(likeid)
+        // delete likeid from post model like array
+        await Post.findOneAndUpdate({_id:postId},{$pull:{like:likeid}})
+            return res.status(200).json({
+                success:true,
+                message:"post disliked successfully"
+            })  
+    }
+    catch(error){
+        res.status(500).json({
+            success:false,
+            message:"error occured while disliking post",
+            error:error.message
+        })
+    }
+}

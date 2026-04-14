@@ -27,3 +27,25 @@ exports.createComment=async(req,res)=>{
         })
     }
 }
+
+// delete comment
+exports.deleteComment=async(req,res)=>{
+    try{
+        const {postId,commentId}=req.body
+        await Comment.findByIdAndDelete(commentId)
+        // delete commentId from post model comment array
+        await Post.findOneAndUpdate({_id:postId},{$pull:{comments:commentId}})
+
+        return res.status(200).json({
+            success:true,
+            message:"comment deleted successfully"
+        })
+    }
+    catch(error){
+        res.status(500).json({
+            success:false,
+            message:"error occured while deleting comment",
+            error:error.message
+        })
+    }
+}
